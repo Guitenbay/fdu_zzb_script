@@ -3,6 +3,9 @@ const XLSX = require("xlsx");
 const { getTWList } = require("../api");
 const fs = require("fs");
 
+/**
+ * 在这里更新 COOKIE
+ */
 const COOKIE =
   "_csrf=wYuhnn4MbRWBksEXXNxZezzi0bwj11it; zhtjWeb_SessionName__=MTYzMTk2MTAwN3xOd3dBTkVkRE56VTBSa296V2xRME16ZEtUREpTTTFReVVFbFZXVnBCVjFWUk1rNUlWRXRWVUZWWFYwSkdSMUJYVVZwUlFVUkNTa0U9fCw-grqi5u_N6J_bqMcQxzkk7xbIJ4B78QVS4wc1hinc; Hm_lpvt_969516094b342230ceaf065c844d82f3=1631957142; Hm_lvt_969516094b342230ceaf065c844d82f3=1631842643,1631842836,1631843063,1631843895; wdcid=61ea7f5b77adfe63; Hm_lpvt_6b6f156e3a29eb21f7b51188949a9d4d=1631363215; Hm_lvt_6b6f156e3a29eb21f7b51188949a9d4d=1631363199; zhtj_cookie=67313298; __jsluid_s=086b70fdda34cd697604cf9416f5374f";
 
@@ -35,8 +38,9 @@ async function createChart() {
     })
   );
 
+  console.log("查询完成，结果写入文件 tw_tzb.json...\n");
   fs.writeFileSync("./tw_tzb.json", JSON.stringify(json));
-
+  console.log("写入完成;\n");
   return json;
 }
 
@@ -75,6 +79,7 @@ async function getAllTZBInfo(id, page) {
 }
 
 function readJSON2Chart(data) {
+  console.log("生成 excel 表...\n");
   const basic = XLSX.readFile(BASIC);
   const resultArr = data.reduce((acc, item) => {
     return acc.concat(
@@ -87,9 +92,12 @@ function readJSON2Chart(data) {
   });
 
   XLSX.writeFile(basic, OUT);
+  console.log("生成 out.xlsx;\n");
 }
 
 const data = createChart();
 // const data = require("./tw_tzb.json");
 
 readJSON2Chart(data);
+
+console.log(">> 推出 <<\n");
