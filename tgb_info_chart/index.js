@@ -82,9 +82,9 @@ function readJSON2Chart(data) {
   console.log("生成 out.xlsx;\n");
 }
 
-const data = require("./tgb_list.json");
-// createChartJSON().then((data) => {
-readJSON2Chart(data);
+// const data = require("./tgb_list.json");
+createChartJSON().then((data) => {
+  readJSON2Chart(data);
 
-console.log(">> 推出 <<\n");
-// });
+  console.log(">> 推出 <<\n");
+});
