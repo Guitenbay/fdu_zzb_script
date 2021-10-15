@@ -16,22 +16,27 @@ async function getAllTZBPersonNumberInfo(id, page) {
   --form 'queryLeagueId="${id}"' \
   --form 'queryLeagueTypeId="03TW"' \
   --form 'page="${page}"'`).stdout;
-  const resp = JSON.parse(json);
-  if (resp.retCode === 1000) {
-    const tzbResp = resp.results;
-    if (tzbResp.childMemberCompletionDegreeInfoList === null) {
-      console.log(id, "break;");
-      return [];
-    } else {
-      const nextList = await getAllTZBPersonNumberInfo(id, page + 1);
-      return tzbResp.childMemberCompletionDegreeInfoList
-        .map(({ leagueName, leagueMemberCount }) => ({
-          组织名: leagueName,
-          组织人数: leagueMemberCount,
-        }))
-        .concat(nextList);
-    }
-  } else return null;
+  try {
+    const resp = JSON.parse(json);
+    if (resp.retCode === 1000) {
+      const tzbResp = resp.results;
+      if (tzbResp.childMemberCompletionDegreeInfoList === null) {
+        console.log(id, "break;");
+        return [];
+      } else {
+        const nextList = await getAllTZBPersonNumberInfo(id, page + 1);
+        return tzbResp.childMemberCompletionDegreeInfoList
+          .map(({ leagueName, leagueMemberCount }) => ({
+            组织名: leagueName,
+            组织人数: leagueMemberCount,
+          }))
+          .concat(nextList);
+      }
+    } else return null;
+  } catch (e) {
+    console.error(`Error: ${id}, page: ${page}`);
+    return null;
+  }
 }
 
 async function getTGBListByQueryLeagueId(id) {
@@ -51,10 +56,15 @@ async function getTGBListByQueryLeagueId(id) {
         "curPage": "1"
     }'`).stdout;
   console.log(json);
-  const resp = JSON.parse(json);
-  if (resp.retCode === 1000) {
-    return resp.results;
-  } else return null;
+  try {
+    const resp = JSON.parse(json);
+    if (resp.retCode === 1000) {
+      return resp.results;
+    } else return null;
+  } catch (e) {
+    console.error(`Error: ${id}`);
+    return null;
+  }
 }
 
 async function getTYListByQueryLeagueId(id, typeId) {
@@ -67,10 +77,15 @@ async function getTYListByQueryLeagueId(id, typeId) {
     --form 'queryLeagueTypeId="${typeId}"' \
     --form 'sectionName="first"'`).stdout;
   console.log(json);
-  const resp = JSON.parse(json);
-  if (resp.retCode === 1000) {
-    return resp.results;
-  } else return null;
+  try {
+    const resp = JSON.parse(json);
+    if (resp.retCode === 1000) {
+      return resp.results;
+    } else return null;
+  } catch (e) {
+    console.error(`Error: ${id}, ${typeId}`);
+    return null;
+  }
 }
 
 async function getAllTZBTreeList(id) {
@@ -80,28 +95,38 @@ async function getAllTZBTreeList(id) {
     shell.exec(`curl --location --request POST 'https://zhtj.youth.cn/v1/center/getorgtree' \
     --header 'Cookie: ${COOKIE}' \
     --form 'queryLeagueId="${id}"'`).stdout;
-  const resp = JSON.parse(json);
-  if (resp.retCode === 1000) {
-    const list = resp.results.leagueList;
-    if (list === undefined) {
-      console.log(`Error: ${id}`);
-      return [];
-    }
-    return Promise.all(
-      list.map(async ({ leagueId, leagueFullName, leagueTypeId }) => {
-        if (leagueTypeId === "02TZZ" || leagueTypeId === "03TW") {
-          const nextList = await getAllTZBTreeList(leagueId);
-          return { leagueId, leagueFullName, leagueTypeId, children: nextList };
-        } else {
-          return {
-            leagueId,
-            leagueFullName,
-            leagueTypeId,
-          };
-        }
-      })
-    );
-  } else return null;
+  try {
+    const resp = JSON.parse(json);
+    if (resp.retCode === 1000) {
+      const list = resp.results.leagueList;
+      if (list === undefined) {
+        console.log(`Error: ${id}`);
+        return [];
+      }
+      return Promise.all(
+        list.map(async ({ leagueId, leagueFullName, leagueTypeId }) => {
+          if (leagueTypeId === "02TZZ" || leagueTypeId === "03TW") {
+            const nextList = await getAllTZBTreeList(leagueId);
+            return {
+              leagueId,
+              leagueFullName,
+              leagueTypeId,
+              children: nextList,
+            };
+          } else {
+            return {
+              leagueId,
+              leagueFullName,
+              leagueTypeId,
+            };
+          }
+        })
+      );
+    } else return null;
+  } catch (e) {
+    console.error(`Error: ${id}`);
+    return null;
+  }
 }
 
 async function getTWListByQueryLeagueId(id) {
@@ -111,10 +136,15 @@ async function getTWListByQueryLeagueId(id) {
     shell.exec(`curl --location --request POST 'https://zhtj.youth.cn/v1/center/getorgtree' \
     --header 'Cookie: ${COOKIE}' \
     --form 'queryLeagueId="${id}"'`).stdout;
-  const resp = JSON.parse(json);
-  if (resp.retCode === 1000) {
-    return resp.results;
-  } else return null;
+  try {
+    const resp = JSON.parse(json);
+    if (resp.retCode === 1000) {
+      return resp.results;
+    } else return null;
+  } catch (e) {
+    console.error(`Error: ${id}`);
+    return null;
+  }
 }
 
 module.exports = {

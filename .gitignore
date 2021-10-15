@@ -20,3 +20,4 @@
 /.env.local
 
 out.xlsx
+data/*.xlsx
