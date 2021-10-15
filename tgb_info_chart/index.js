@@ -83,8 +83,21 @@ function readJSON2Chart(data) {
 }
 
 // const data = require("./tgb_list.json");
+// const dataWithoutBiye = data.filter(({ 支部名, 团总支名 }) => {
+//   return (
+//     // (支部名 &&
+//     //   !支部名.includes("2016") &&
+//     //   !支部名.includes("2017") &&
+//     //   !支部名.includes("2018")) ||
+//     // (团总支名 &&
+//     //   !团总支名.includes("2016") &&
+//     //   !团总支名.includes("2017") &&
+//     //   !团总支名.includes("2018")) ||
+//     支部名 === undefined && 团总支名 === undefined
+//   );
+// });
 createChartJSON().then((data) => {
-  readJSON2Chart(data);
+  readJSON2Chart(dataWithoutBiye);
 
   console.log(">> 推出 <<\n");
 });

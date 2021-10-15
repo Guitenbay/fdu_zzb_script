@@ -4,7 +4,7 @@ const { readJSON2Chart } = require("./excel");
  */
 const OUT = "./out.xlsx";
 
-const data = require("./tw_tzb.json");
+const data = require("./tzb_list.json");
 
 readJSON2Chart(data, OUT);
 
