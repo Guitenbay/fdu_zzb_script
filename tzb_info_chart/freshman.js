@@ -19,5 +19,5 @@ const freshmanList = data.filter(
   ({ 支部名 }) => 支部名.includes("2021") || 支部名.includes("新生")
 );
 
-readJSON2Chart(freshmanList, "./freshman.xlsx");
+readJSON2Chart(freshmanList, "./out-freshman.xlsx");
 console.log(">> 推出 <<\n");

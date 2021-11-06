@@ -19,5 +19,5 @@
 /src/.umi-test
 /.env.local
 
-out.xlsx
+out*.xlsx
 data/*.xlsx

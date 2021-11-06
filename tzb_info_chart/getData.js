@@ -65,6 +65,7 @@ async function tree2tgbList(tree) {
     return {
       支部名: tree.leagueFullName,
       组织人数: tgbList.totalNumber,
+      支部类型: tree.leagueTypeId,
     };
   }
 }
