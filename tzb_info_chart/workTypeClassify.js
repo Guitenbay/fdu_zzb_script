@@ -12,8 +12,8 @@ const classify_names = [
   "上海市复旦大学华山医院团委",
   "上海市复旦大学儿科医院团委",
   "上海市复旦大学妇产科医院团委",
+  "共青团复旦大学附属肿瘤医院委员会",
   "复旦大学附属眼耳鼻喉科医院团委",
-  "共青团复旦大学附属肿瘤医院委员会 ",
 ];
 function shouldClassify(name) {
   return classify_names.includes(name);
@@ -44,6 +44,7 @@ const map = data
     }
     if (shouldClassify(item.二级组织名)) {
       if (
+        item.支部名.includes("学生") ||
         item.支部名.includes("本科生") ||
         item.支部名.includes("硕") ||
         item.支部名.includes("研究生") ||
@@ -80,3 +81,4 @@ map.forEach((value, key) => {
 
 readJSON2Chart(list, "./out-work-classify.xlsx");
 console.log(">> 推出 <<\n");
+
