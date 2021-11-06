@@ -5,34 +5,6 @@ const fs = require("fs");
  * 获取团支部团员人数数据
  */
 
-// async function createChartJSON() {
-//   const twsResp = await getTWListByQueryLeagueId("kewYH7OhwH7Lilh-efvOEQ==");
-//   const twsList = twsResp ? twsResp.leagueList : [];
-
-//   const tws = twsList.map(({ leagueId, leagueName }) => ({
-//     twId: leagueId,
-//     tw: leagueName,
-//   }));
-
-//   fs.writeFileSync("./tws.json", JSON.stringify(tws));
-
-//   const json = await Promise.all(
-//     tws.map(async ({ twId, tw }) => {
-//       const tzbResp = await getAllTZBPersonNumberInfo(twId, 1);
-//       const tzbInfos = tzbResp ?? {};
-//       return {
-//         tw,
-//         tzbs: tzbInfos,
-//       };
-//     })
-//   );
-
-//   console.log("查询完成，结果写入文件 tw_tzb.json...\n");
-//   fs.writeFileSync("./tw_tzb.json", JSON.stringify(json));
-//   console.log("写入完成;\n");
-//   return json;
-// }
-
 async function tree2tgbList(tree) {
   if (Array.isArray(tree.children) && tree.children.length > 0) {
     const result = await Promise.all(

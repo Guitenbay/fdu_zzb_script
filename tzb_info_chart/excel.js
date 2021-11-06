@@ -12,7 +12,8 @@ function readJSON2Chart(data, outputFile) {
   // }, []);
 
   basic.Sheets[basic.SheetNames[0]] = XLSX.utils.json_to_sheet(data, {
-    header: ["团委名", "团总支名", "支部名", "其他", "组织人数"],
+    // header: ["团委名", "团总支名", "支部名", "其他", "组织人数"],
+    header: [],
   });
 
   XLSX.writeFile(basic, outputFile);
