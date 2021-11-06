@@ -105,7 +105,7 @@ async function getAllTZBTreeList(id) {
       }
       return Promise.all(
         list.map(async ({ leagueId, leagueFullName, leagueTypeId }) => {
-          if (leagueTypeId === "02TZZ" || leagueTypeId === "03TW") {
+          if (leagueTypeId === "02TZZ" || leagueTypeId === "03TW" || leagueTypeId === "04TGW") {
             const nextList = await getAllTZBTreeList(leagueId);
             return {
               leagueId,
