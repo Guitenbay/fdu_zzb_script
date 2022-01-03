@@ -32,7 +32,10 @@ async function getAllTZBPersonNumberInfo(id, page) {
           }))
           .concat(nextList);
       }
-    } else return null;
+    } else {
+      console.log(json);
+      return null;
+    }
   } catch (e) {
     console.error(`Error: ${id}, page: ${page}`);
     return null;
@@ -55,12 +58,15 @@ async function getTGBListByQueryLeagueId(id) {
         "queryLeagueId": "${id}",
         "curPage": "1"
     }'`).stdout;
-  console.log(json);
+  // console.log(json);
   try {
     const resp = JSON.parse(json);
     if (resp.retCode === 1000) {
       return resp.results;
-    } else return null;
+    } else {
+      console.log(json);
+      return null;
+    }
   } catch (e) {
     console.error(`Error: ${id}`);
     return null;
@@ -76,12 +82,14 @@ async function getTYListByQueryLeagueId(id, typeId) {
     --form 'queryLeagueId="${id}"' \
     --form 'queryLeagueTypeId="${typeId}"' \
     --form 'sectionName="first"'`).stdout;
-  console.log(json);
   try {
     const resp = JSON.parse(json);
     if (resp.retCode === 1000) {
       return resp.results;
-    } else return null;
+    } else {
+      console.log(json);
+      return null;
+    }
   } catch (e) {
     console.error(`Error: ${id}, ${typeId}`);
     return null;
@@ -105,7 +113,11 @@ async function getAllTZBTreeList(id) {
       }
       return Promise.all(
         list.map(async ({ leagueId, leagueFullName, leagueTypeId }) => {
-          if (leagueTypeId === "02TZZ" || leagueTypeId === "03TW" || leagueTypeId === "04TGW") {
+          if (
+            leagueTypeId === "02TZZ" ||
+            leagueTypeId === "03TW" ||
+            leagueTypeId === "04TGW"
+          ) {
             const nextList = await getAllTZBTreeList(leagueId);
             return {
               leagueId,
@@ -122,7 +134,10 @@ async function getAllTZBTreeList(id) {
           }
         })
       );
-    } else return null;
+    } else {
+      console.log(json);
+      return null;
+    }
   } catch (e) {
     console.error(`Error: ${id}`);
     return null;
@@ -140,7 +155,10 @@ async function getTWListByQueryLeagueId(id) {
     const resp = JSON.parse(json);
     if (resp.retCode === 1000) {
       return resp.results;
-    } else return null;
+    } else {
+      console.log(json);
+      return null;
+    }
   } catch (e) {
     console.error(`Error: ${id}`);
     return null;

@@ -33,7 +33,7 @@ async function tree2tgbList(tree) {
     const key =
       tree.leagueTypeId === "02TZZ"
         ? "团总支名"
-        : tree.leagueTypeId === "03TW"
+        : tree.leagueTypeId === "03TW" || tree.leagueTypeId === "04TGW"
         ? "团委名"
         : "其他";
     return list
@@ -82,7 +82,7 @@ function readJSON2Chart(data) {
   console.log("生成 out.xlsx;\n");
 }
 
-// const data = require("./tgb_list.json");
+const data = require("./tgb_list.json");
 // const dataWithoutBiye = data.filter(({ 支部名, 团总支名 }) => {
 //   return (
 //     // (支部名 &&
@@ -97,7 +97,7 @@ function readJSON2Chart(data) {
 //   );
 // });
 createChartJSON().then((data) => {
-  readJSON2Chart(dataWithoutBiye);
+  readJSON2Chart(data);
 
   console.log(">> 推出 <<\n");
 });
