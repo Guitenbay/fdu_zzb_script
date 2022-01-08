@@ -57,7 +57,9 @@ async function createChartJSON() {
   let startIndex = CURRENT_LIST.length;
   const len = tzbList.length;
   if (startIndex === len) {
-    console.log('之前已全部查询完成，如需更新查询数据，请删除本文件夹下的 tzb_list.json 文件，再重新启动脚本 <<\n');
+    console.log(
+      "之前已全部查询完成，如需更新查询数据，请删除本文件夹下的 tzb_list.json 文件，再重新启动脚本 <<\n"
+    );
     return;
   }
   for (let i = startIndex; i < len; i++) {
@@ -73,7 +75,9 @@ async function createChartJSON() {
       console.log("写入完成;\n");
       return;
     }
-    console.log(`${i}/${(i * 100/len).toFixed(2)}%: ${list.totalNumber}`);
+    console.log(
+      `${i + 1}/${((i + 1) * 100 / len).toFixed(2)}%: ${list.totalNumber}`
+    );
     tzbResultList.push({
       ...tzbList[i],
       组织人数: list.totalNumber,

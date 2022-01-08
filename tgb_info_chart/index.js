@@ -1,9 +1,5 @@
 const XLSX = require("xlsx");
-const {
-  // wait,
-  getTGBListByQueryLeagueId,
-  getAllTZBTreeList,
-} = require("../api");
+const { wait, getTGBListByQueryLeagueId, tree2tzbList } = require("../api");
 const fs = require("fs");
 
 /**
@@ -12,63 +8,58 @@ const fs = require("fs");
 const BASIC = "../basic.xlsx";
 const OUT = "./out.xlsx";
 
-async function tree2tgbList(tree) {
-  if (tree.leagueId === undefined)
-    return [
-      {
-        支部名: tree.leagueFullName,
-        团干部人数: "未知",
-      },
-    ];
-  const tgbResp = await getTGBListByQueryLeagueId(tree.leagueId);
-  const tgbList = tgbResp ?? {};
-  if (Array.isArray(tree.children) && tree.children.length > 0) {
-    const result = await Promise.all(
-      tree.children.map(async (tree) => {
-        const list = await tree2tgbList(tree);
-        return list;
-      })
-    );
-    const list = result.flat();
-    const key =
-      tree.leagueTypeId === "02TZZ"
-        ? "团总支名"
-        : tree.leagueTypeId === "03TW" || tree.leagueTypeId === "04TGW"
-        ? "团委名"
-        : "其他";
-    return list
-      .map((item) => ({ ...item, [key]: tree.leagueFullName }))
-      .concat([
-        {
-          [key]: tree.leagueFullName,
-          团干部人数: tgbList.totalNumber,
-        },
-      ]);
-  } else {
-    return {
-      支部名: tree.leagueFullName,
-      团干部人数: tgbList.totalNumber,
-    };
-  }
-}
-
+/**
+ * 获取团支部团干部人数数据
+ */
 async function createChartJSON() {
   const tzbTreeList = require("../tzb_tree/tzb_tree.json");
+  let CURRENT_LIST = [];
+  if (fs.existsSync("./tgb_list.json")) {
+    CURRENT_LIST = require("./tgb_list.json");
+  }
 
-  const result = await Promise.all(
-    tzbTreeList.map(async (tree) => {
-      const list = await tree2tgbList(tree);
-      return list;
-    })
-  );
-  const tzbList = result.flat();
+  const treeList = tzbTreeList.map((tree) => {
+    const list = tree2tzbList(tree);
+    return list;
+  });
+  const tzbList = treeList.flat();
   console.log(tzbList.length);
 
+  const tzbResultList = CURRENT_LIST;
+  let startIndex = CURRENT_LIST.length;
+  const len = tzbList.length;
+  if (startIndex === len) {
+    console.log(
+      "之前已全部查询完成，如需更新查询数据，请删除本文件夹下的 tgb_list.json 文件，再重新启动脚本 <<\n"
+    );
+    return;
+  }
+  for (let i = startIndex; i < len; i++) {
+    await wait(3000);
+    const resp = await getTGBListByQueryLeagueId(tzbList[i].ID);
+    const list = resp;
+    if (resp === null) {
+      console.log("查询中止，结果写入文件 tgb_list.json...\n");
+      fs.writeFileSync("./tgb_list.json", JSON.stringify(tzbResultList));
+      console.log("写入完成;\n");
+      return;
+    }
+    console.log(
+      `${i + 1}/${(((i + 1) * 100) / len).toFixed(2)}%: ${list.totalNumber}`
+    );
+    tzbResultList.push({
+      ...tzbList[i],
+      团干部人数: list.totalNumber,
+    });
+  }
+
   console.log("查询完成，结果写入文件 tgb_list.json...\n");
-  fs.writeFileSync("./tgb_list.json", JSON.stringify(tzbList));
+  fs.writeFileSync("./tgb_list.json", JSON.stringify(tzbResultList));
   console.log("写入完成;\n");
   return tzbList;
 }
+
+// createChartJSON();
 
 function readJSON2Chart(data) {
   console.log("生成 excel 表...\n");
@@ -82,6 +73,7 @@ function readJSON2Chart(data) {
   console.log("生成 out.xlsx;\n");
 }
 
+// createChartJSON()
 const data = require("./tgb_list.json");
 // const dataWithoutBiye = data.filter(({ 支部名, 团总支名 }) => {
 //   return (
@@ -96,8 +88,8 @@ const data = require("./tgb_list.json");
 //     支部名 === undefined && 团总支名 === undefined
 //   );
 // });
-createChartJSON().then((data) => {
-  readJSON2Chart(data);
+// createChartJSON().then((data) => {
+readJSON2Chart(data);
 
-  console.log(">> 推出 <<\n");
-});
+console.log(">> 推出 <<\n");
+// });

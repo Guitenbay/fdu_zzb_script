@@ -165,6 +165,40 @@ async function getTWListByQueryLeagueId(id) {
   }
 }
 
+function tree2tzbList(tree) {
+  if (Array.isArray(tree.children) && tree.children.length > 0) {
+    const result = tree.children.map((tree) => {
+      const list = tree2tzbList(tree);
+      return list;
+    });
+    const list = result.flat();
+    const key =
+      tree.leagueTypeId === "02TZZ"
+        ? "团总支名"
+        : tree.leagueTypeId === "03TW" || tree.leagueTypeId === "04TGW"
+        ? "团委名"
+        : "其他";
+    return list.map((item) => ({ ...item, [key]: tree.leagueFullName }));
+  } else {
+    if (tree.leagueId === undefined) {
+      return [
+        {
+          ID: undefined,
+          支部类型: tree.leagueTypeId,
+          支部名: tree.leagueFullName,
+          组织人数: "未知",
+        },
+      ];
+    }
+    return {
+      ID: tree.leagueId,
+      支部名: tree.leagueFullName,
+      支部类型: tree.leagueTypeId,
+      组织人数: undefined,
+    };
+  }
+}
+
 module.exports = {
   wait,
   getAllTZBPersonNumberInfo,
@@ -172,4 +206,5 @@ module.exports = {
   getTWListByQueryLeagueId,
   getTGBListByQueryLeagueId,
   getTYListByQueryLeagueId,
+  tree2tzbList,
 };
