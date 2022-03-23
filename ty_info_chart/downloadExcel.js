@@ -55,7 +55,7 @@ async function downloadAllExcel() {
   return tzbList;
 }
 
-postLoginInfo().then((res) => {
+postLoginInfo().then(([res]) => {
   if (res) {
     downloadAllExcel();
     // downloadTyListExcel(

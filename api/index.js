@@ -183,15 +183,15 @@ async function postLoginInfo() {
       if (response.data.retCode === 1000) {
         // console.log(response.data.results);
         console.log("已登录");
-        return true;
+        return [true, response.data.results];
       } else {
         console.log(response.data.retMsg);
-        return false;
+        return [false, null];
       }
     })
     .catch(function (error) {
       console.log(error);
-      return false;
+      return [false, null];
     });
 }
 
