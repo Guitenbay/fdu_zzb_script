@@ -21,17 +21,17 @@ const excels = files
 //     excels.map((excel) => ({ ...excel, 团委名: academy }))
 //   )
 //   .flat();
-// readJSON2Chart(json, "out.xlsx");
+// writeJSON2Chart(json, "out.xlsx");
 
-function readJSON2Chart(data, outputFile) {
+function writeJSON2Chart(data, outputFile) {
   console.log("生成 excel 表...\n");
-  const basic = XLSX.readFile(BASIC);
+  const basic = XLSX.readFile(path.resolve(__dirname, BASIC));
 
   basic.Sheets[basic.SheetNames[0]] = XLSX.utils.json_to_sheet(data, {
     header: ["团委名", "文件名", "行数"],
   });
 
-  XLSX.writeFile(basic, outputFile);
+  XLSX.writeFile(basic, path.resolve(__dirname, outputFile));
   console.log(`生成 ${outputFile};\n`);
 }
 

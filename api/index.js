@@ -1,4 +1,7 @@
 const shell = require("shelljs");
+const axios = require("axios");
+const fs = require("fs");
+const path = require("path");
 
 shell.config.silent = true;
 const { COOKIE } = require("../COOKIE.json");
@@ -165,6 +168,68 @@ async function getTWListByQueryLeagueId(id) {
   }
 }
 
+async function postLoginInfo() {
+  const config = {
+    method: "post",
+    url: "https://zhtj.youth.cn/v1/center/leaguehome",
+    headers: {
+      Cookie:
+        "_csrf=EMo4XhBufA0yQTRlNdfjRdID6rritVtB; zhtjWeb_SessionName__=MTY0ODAzMzgzNXxOd3dBTkVOSU4wZElWVUUyUWs1RVNrNDNObE5LU1VGUFVreEdURTlVTXpkS1VrVklNMGxWV1UwelJVOVlOVVJMVEZwRFJrNVNTMEU9fDmxt4u8d5vR5YY71Iju2eYpUprQpd0KL6LmMbfkY67C; Hm_lpvt_969516094b342230ceaf065c844d82f3=1648033826; Hm_lvt_969516094b342230ceaf065c844d82f3=1648016191,1648019694,1648020881,1648033826; zhtj_cookie=91349450; __jsluid_h=9b6d3e1d8c0a2df81952dcbe07224599; __jsluid_s=1c5072aab9c54980551c7b7a0580b627; _csrf=EMo4XhBufA0yQTRlNdfjRdID6rritVtB",
+    },
+  };
+
+  return axios(config)
+    .then(function (response) {
+      if (response.data.retCode === 1000) {
+        // console.log(response.data.results);
+        console.log("已登录");
+        return true;
+      } else {
+        console.log(response.data.retMsg);
+        return false;
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+      return false;
+    });
+}
+
+async function downloadTyListExcel(id, filename) {
+  console.log(id, "GET TYExcel pending...");
+  const config = {
+    method: "get",
+    url: `https://zhtj.youth.cn/v1/center/tuanweiexportmembers/${id}`,
+    headers: {
+      Cookie: COOKIE,
+    },
+    responseType: "stream",
+  };
+
+  const filepath = path.resolve(__dirname, `../ty_info_chart/download/`);
+  if (!fs.existsSync(filepath)) {
+    fs.mkdirSync(filepath);
+  }
+  const writer = fs.createWriteStream(
+    path.resolve(filepath, `${filename}.xlsx`)
+  );
+  const response = await axios(config);
+  response.data.pipe(writer);
+  return new Promise((resolve, reject) => {
+    writer.on("finish", () => {
+      console.log(`写入 ${filename}.xlsx 完成;\n`);
+      resolve(true);
+    });
+    writer.on("error", (e) => {
+      console.error(
+        `Error: ${id}\n > 手动下载： https://zhtj.youth.cn/v1/center/tuanweiexportmembers/${id}`
+      );
+      console.log(e);
+      reject(false);
+    });
+  });
+}
+
 function tree2tzbList(tree) {
   if (Array.isArray(tree.children) && tree.children.length > 0) {
     const result = tree.children.map((tree) => {
@@ -206,5 +271,7 @@ module.exports = {
   getTWListByQueryLeagueId,
   getTGBListByQueryLeagueId,
   getTYListByQueryLeagueId,
+  postLoginInfo,
+  downloadTyListExcel,
   tree2tzbList,
 };

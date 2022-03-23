@@ -1,12 +1,13 @@
 const XLSX = require("xlsx");
 // const { saveUserInfo } = require("./api");
+const path = require("path");
 
 const BASIC = "./basic.xlsx";
 const DATA = "./data.xlsx";
 const OUT = "./out.xlsx";
 
-const basic = XLSX.readFile(BASIC);
-const data = XLSX.readFile(DATA);
+const basic = XLSX.readFile(path.resolve(__dirname, BASIC));
+const data = XLSX.readFile(path.resolve(__dirname, DATA));
 
 const dJson = XLSX.utils.sheet_to_json(data.Sheets[data.SheetNames[0]], {
   skipHeader: true,
@@ -64,6 +65,6 @@ Object.entries(basic.Sheets).forEach(([key, value]) => {
   });
 });
 
-XLSX.writeFile(basic, OUT);
+XLSX.writeFile(basic, path.resolve(__dirname, OUT));
 
 console.log(resultArr);

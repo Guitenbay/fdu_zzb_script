@@ -1,10 +1,11 @@
 const XLSX = require("xlsx");
+const path = require("path");
 
 const BASIC = "../basic.xlsx";
 
-function readJSON2Chart(data, outputFile) {
+function writeJSON2Chart(data, outputFile) {
   console.log("生成 excel 表...\n");
-  const basic = XLSX.readFile(BASIC);
+  const basic = XLSX.readFile(path.resolve(__dirname, BASIC));
   // const resultArr = data.reduce((acc, item) => {
   //   return acc.concat(
   //     item.tzbs.map((tzb) => ({ ...tzb, 二级团组织: item.tw }))
@@ -16,10 +17,10 @@ function readJSON2Chart(data, outputFile) {
     header: [],
   });
 
-  XLSX.writeFile(basic, outputFile);
+  XLSX.writeFile(basic, path.resolve(__dirname, outputFile));
   console.log(`生成 ${outputFile};\n`);
 }
 
 module.exports = {
-  readJSON2Chart,
+  writeJSON2Chart,
 };
