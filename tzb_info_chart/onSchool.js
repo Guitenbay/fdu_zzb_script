@@ -1,4 +1,5 @@
 const { writeJSON2Chart } = require("./excel");
+const path = require("path");
 
 /**
  * 生成在校或毕业团支部团员人数表
@@ -14,5 +15,5 @@ const list = data.filter(({ 支部类型 }) => {
   return 支部类型 !== "06BYBTZB";
 });
 
-writeJSON2Chart(list, biye ? "./out-beye.xlsx" : "./out-onSchool.xlsx");
+writeJSON2Chart(list, path.resolve(__dirname, biye ? "out-beye.xlsx" : "out-onSchool.xlsx"));
 console.log(">> 推出 <<\n");

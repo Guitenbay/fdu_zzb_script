@@ -1,4 +1,5 @@
 const { writeJSON2Chart } = require("./excel");
+const path = require("path");
 
 const classify_names = [
   "上海市复旦大学科研机构综合团委",
@@ -85,7 +86,7 @@ const workTypeClassify = () => {
 
 const list = workTypeClassify();
 
-writeJSON2Chart(list, "./out-work-classify.xlsx");
+writeJSON2Chart(list, path.resolve(__dirname, "out-work-classify.xlsx"));
 console.log(">> 推出 <<\n");
 
 module.exports = {

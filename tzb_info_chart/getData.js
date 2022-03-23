@@ -1,5 +1,6 @@
 const { getTYListByQueryLeagueId, wait } = require("../api");
 const fs = require("fs");
+const path = require("path");
 
 /**
  * 获取团支部团员人数数据
@@ -42,7 +43,7 @@ function tree2tzbList(tree) {
 async function createChartJSON() {
   const tzbTreeList = require("../tzb_tree/tzb_tree.json");
   let CURRENT_LIST = [];
-  if (fs.existsSync("./tzb_list.json")) {
+  if (fs.existsSync(path.resolve(__dirname, "tzb_list.json"))) {
     CURRENT_LIST = require("./tzb_list.json");
   }
 
@@ -56,7 +57,7 @@ async function createChartJSON() {
   const tzbResultList = CURRENT_LIST;
   let startIndex = CURRENT_LIST.length;
   const len = tzbList.length;
-  if (startIndex === len) {
+  if (startIndex >= len) {
     console.log(
       "之前已全部查询完成，如需更新查询数据，请删除本文件夹下的 tzb_list.json 文件，再重新启动脚本 <<\n"
     );
@@ -71,7 +72,7 @@ async function createChartJSON() {
     const list = resp;
     if (resp === null) {
       console.log("查询中止，结果写入文件 tzb_list.json...\n");
-      fs.writeFileSync("./tzb_list.json", JSON.stringify(tzbResultList));
+      fs.writeFileSync(path.resolve(__dirname, "tzb_list.json"), JSON.stringify(tzbResultList));
       console.log("写入完成;\n");
       return;
     }
@@ -85,7 +86,7 @@ async function createChartJSON() {
   }
 
   console.log("查询完成，结果写入文件 tzb_list.json...\n");
-  fs.writeFileSync("./tzb_list.json", JSON.stringify(tzbResultList));
+  fs.writeFileSync(path.resolve(__dirname, "tzb_list.json"), JSON.stringify(tzbResultList));
   console.log("写入完成;\n");
   return tzbList;
 }

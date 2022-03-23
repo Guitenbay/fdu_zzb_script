@@ -1,9 +1,10 @@
-const shell = require("shelljs");
+// const shell = require("shelljs");
 const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
+const FormData = require("form-data");
 
-shell.config.silent = true;
+// shell.config.silent = true;
 const { COOKIE } = require("../COOKIE.json");
 
 function wait(ms) {
@@ -13,14 +14,23 @@ function wait(ms) {
 async function getAllTZBPersonNumberInfo(id, page) {
   await wait(2000);
   console.log(id, page, "GET TZB Person pending...");
-  const json =
-    shell.exec(`curl --location --request POST 'https://zhtj.youth.cn/v1/center/tuanyuantw/memberCountList' \
-  --header 'Cookie: ${COOKIE}' \
-  --form 'queryLeagueId="${id}"' \
-  --form 'queryLeagueTypeId="03TW"' \
-  --form 'page="${page}"'`).stdout;
+  const data = new FormData();
+  data.append("queryLeagueId", id);
+  data.append("queryLeagueTypeId", "03TW");
+  data.append("page", page);
+
+  const config = {
+    method: "post",
+    url: "https://zhtj.youth.cn/v1/center/tuanyuantw/memberCountList",
+    headers: {
+      Cookie: COOKIE,
+      ...data.getHeaders(),
+    },
+    data: data,
+  };
+
   try {
-    const resp = JSON.parse(json);
+    const { data: resp } = await axios(config);
     if (resp.retCode === 1000) {
       const tzbResp = resp.results;
       if (tzbResp.childMemberCompletionDegreeInfoList === null) {
@@ -48,22 +58,28 @@ async function getAllTZBPersonNumberInfo(id, page) {
 async function getTGBListByQueryLeagueId(id) {
   // await wait(2000);
   console.log(id, "GET TGBList pending...");
-  const json =
-    shell.exec(`curl --location --request POST 'https://zhtj.youth.cn/v1/center/tuanyuan/tglist' \
-    --header 'Cookie: ${COOKIE}' \
-    --header 'Content-Type: application/json' \
-    --data-raw '{
-        "curUserId": "ADFLwIE5jxMFbPwkW2fi8g==",
-        "curLeagueId": "kewYH7OhwH7Lilh-efvOEQ==",
-        "queryContent": "",
-        "gender": "-1",
-        "identityCardNo": "",
-        "queryLeagueId": "${id}",
-        "curPage": "1"
-    }'`).stdout;
-  // console.log(json);
+  const data = JSON.stringify({
+    curUserId: "ADFLwIE5jxMFbPwkW2fi8g==",
+    curLeagueId: "kewYH7OhwH7Lilh-efvOEQ==",
+    queryContent: "",
+    gender: "-1",
+    identityCardNo: "",
+    queryLeagueId: id,
+    curPage: "1",
+  });
+
+  const config = {
+    method: "post",
+    url: "https://zhtj.youth.cn/v1/center/tuanyuan/tglist",
+    headers: {
+      Cookie: COOKIE,
+      "Content-Type": "application/json",
+    },
+    data: data,
+  };
+
   try {
-    const resp = JSON.parse(json);
+    const { data: resp } = await axios(config);
     if (resp.retCode === 1000) {
       return resp.results;
     } else {
@@ -79,14 +95,24 @@ async function getTGBListByQueryLeagueId(id) {
 async function getTYListByQueryLeagueId(id, typeId) {
   // await wait(2000);
   console.log(id, "GET TYList pending...");
-  const json =
-    shell.exec(`curl --location --request POST 'https://zhtj.youth.cn/v1/center/tuanyuantw/list' \
-    --header 'Cookie: ${COOKIE}' \
-    --form 'queryLeagueId="${id}"' \
-    --form 'queryLeagueTypeId="${typeId}"' \
-    --form 'sectionName="first"'`).stdout;
+
+  const data = new FormData();
+  data.append("queryLeagueId", id);
+  data.append("queryLeagueTypeId", typeId);
+  data.append("sectionName", "first");
+
+  var config = {
+    method: "post",
+    url: "https://zhtj.youth.cn/v1/center/tuanyuantw/list",
+    headers: {
+      Cookie: COOKIE,
+      ...data.getHeaders(),
+    },
+    data: data,
+  };
+
   try {
-    const resp = JSON.parse(json);
+    const { data: resp } = await axios(config);
     if (resp.retCode === 1000) {
       return resp.results;
     } else {
@@ -100,43 +126,55 @@ async function getTYListByQueryLeagueId(id, typeId) {
 }
 
 async function getAllTZBTreeList(id) {
-  await wait(2000);
+  // await wait(1000);
   console.log(id, "GET TZBList pending...");
-  const json =
-    shell.exec(`curl --location --request POST 'https://zhtj.youth.cn/v1/center/getorgtree' \
-    --header 'Cookie: ${COOKIE}' \
-    --form 'queryLeagueId="${id}"'`).stdout;
+
+  const data = new FormData();
+  data.append("queryLeagueId", id);
+
+  const config = {
+    method: "post",
+    url: "https://zhtj.youth.cn/v1/center/getorgtree",
+    headers: {
+      Cookie: COOKIE,
+      ...data.getHeaders(),
+    },
+    data: data,
+  };
+
   try {
-    const resp = JSON.parse(json);
+    const { data: resp } = await axios(config);
     if (resp.retCode === 1000) {
       const list = resp.results.leagueList;
       if (list === undefined) {
         console.log(`Error: ${id}`);
         return [];
       }
-      return Promise.all(
-        list.map(async ({ leagueId, leagueFullName, leagueTypeId }) => {
-          if (
-            leagueTypeId === "02TZZ" ||
-            leagueTypeId === "03TW" ||
-            leagueTypeId === "04TGW"
-          ) {
-            const nextList = await getAllTZBTreeList(leagueId);
-            return {
+      const result = [];
+      for (const { leagueId, leagueFullName, leagueTypeId } of list) {
+        if (
+          leagueTypeId === "02TZZ" ||
+          leagueTypeId === "03TW" ||
+          leagueTypeId === "04TGW"
+        ) {
+          const nextList = await getAllTZBTreeList(leagueId);
+          result.push(
+            {
               leagueId,
               leagueFullName,
               leagueTypeId,
               children: nextList,
-            };
-          } else {
-            return {
-              leagueId,
-              leagueFullName,
-              leagueTypeId,
-            };
-          }
-        })
-      );
+            }
+          );
+        } else {
+          result.push({
+            leagueId,
+            leagueFullName,
+            leagueTypeId,
+          });
+        }
+      }
+      return result;
     } else {
       console.log(json);
       return null;
@@ -150,12 +188,22 @@ async function getAllTZBTreeList(id) {
 async function getTWListByQueryLeagueId(id) {
   await wait(2000);
   console.log(id, "GET TWList pending...");
-  const json =
-    shell.exec(`curl --location --request POST 'https://zhtj.youth.cn/v1/center/getorgtree' \
-    --header 'Cookie: ${COOKIE}' \
-    --form 'queryLeagueId="${id}"'`).stdout;
+
+  const data = new FormData();
+  data.append("queryLeagueId", id);
+
+  const config = {
+    method: "post",
+    url: "https://zhtj.youth.cn/v1/center/getorgtree",
+    headers: {
+      Cookie: COOKIE,
+      ...data.getHeaders(),
+    },
+    data: data,
+  };
+
   try {
-    const resp = JSON.parse(json);
+    const { data: resp } = await axios(config);
     if (resp.retCode === 1000) {
       return resp.results;
     } else {
@@ -173,8 +221,7 @@ async function postLoginInfo() {
     method: "post",
     url: "https://zhtj.youth.cn/v1/center/leaguehome",
     headers: {
-      Cookie:
-        "_csrf=EMo4XhBufA0yQTRlNdfjRdID6rritVtB; zhtjWeb_SessionName__=MTY0ODAzMzgzNXxOd3dBTkVOSU4wZElWVUUyUWs1RVNrNDNObE5LU1VGUFVreEdURTlVTXpkS1VrVklNMGxWV1UwelJVOVlOVVJMVEZwRFJrNVNTMEU9fDmxt4u8d5vR5YY71Iju2eYpUprQpd0KL6LmMbfkY67C; Hm_lpvt_969516094b342230ceaf065c844d82f3=1648033826; Hm_lvt_969516094b342230ceaf065c844d82f3=1648016191,1648019694,1648020881,1648033826; zhtj_cookie=91349450; __jsluid_h=9b6d3e1d8c0a2df81952dcbe07224599; __jsluid_s=1c5072aab9c54980551c7b7a0580b627; _csrf=EMo4XhBufA0yQTRlNdfjRdID6rritVtB",
+      Cookie: COOKIE,
     },
   };
 

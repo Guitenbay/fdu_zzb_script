@@ -1,8 +1,9 @@
 const { writeJSON2Chart } = require("./excel");
+const path = require("path");
 /**
  * 生成团支部团员人数表
  */
-const OUT = "./out.xlsx";
+const OUT = path.resolve(__dirname, "./out.xlsx");
 
 const data = require("./tzb_list.json");
 

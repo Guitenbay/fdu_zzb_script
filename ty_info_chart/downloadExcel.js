@@ -5,6 +5,7 @@ const {
   tree2tzbList,
 } = require("../api");
 const fs = require("fs");
+const path = require("path");
 
 /**
  * 生成团支部团干部人数表
@@ -16,7 +17,7 @@ const fs = require("fs");
 async function downloadAllExcel() {
   const tzbTreeList = require("../tzb_tree/tzb_tree.json");
   let CURRENT_LIST = [];
-  if (fs.existsSync("./ty_list.json")) {
+  if (fs.existsSync(path.resolve(__dirname, "ty_list.json"))) {
     CURRENT_LIST = require("./ty_list.json");
   }
 
@@ -30,7 +31,7 @@ async function downloadAllExcel() {
   const tzbResultList = CURRENT_LIST;
   let startIndex = CURRENT_LIST.length;
   const len = tzbList.length;
-  if (startIndex === len) {
+  if (startIndex >= len) {
     console.log(
       "之前已全部查询完成，如需更新查询数据，请删除本文件夹下的 ty_list.json 文件，再重新启动脚本 <<\n"
     );
@@ -50,7 +51,7 @@ async function downloadAllExcel() {
   }
 
   console.log("查询完成，结果写入文件 ty_list.json...\n");
-  fs.writeFileSync("./ty_list.json", JSON.stringify(tzbResultList));
+  fs.writeFileSync(path.resolve(__dirname, "ty_list.json"), JSON.stringify(tzbResultList));
   console.log("写入完成;\n");
   return tzbList;
 }

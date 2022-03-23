@@ -22,7 +22,7 @@ function writeJSON2Chart(data) {
   console.log("生成 out.xlsx;\n");
 }
 
-const data = require("./tgb_list.json");
+const data = require(path.resolve(__dirname, "tgb_list.json"));
 // const dataWithoutBiye = data.filter(({ 支部名, 团总支名 }) => {
 //   return (
 //     // (支部名 &&
