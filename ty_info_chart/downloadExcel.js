@@ -15,17 +15,17 @@ const path = require("path");
  * 获取团支部团干部人数数据
  */
 async function downloadAllExcel() {
-  const tzbTreeList = require("../tzb_tree/tzb_tree.json");
+  const tzbTree = require("../tzb_tree/tzb_tree.json");
   let CURRENT_LIST = [];
   if (fs.existsSync(path.resolve(__dirname, "ty_list.json"))) {
     CURRENT_LIST = require("./ty_list.json");
   }
 
-  const treeList = tzbTreeList.map((tree) => {
+  const treeList = tzbTree.children.map((tree) => {
     const list = tree2tzbList(tree);
     return list;
   });
-  const tzbList = treeList.flat();
+    const tzbList = treeList.flat();
   console.log(tzbList.length);
 
   const tzbResultList = CURRENT_LIST;

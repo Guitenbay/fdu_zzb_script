@@ -10,13 +10,13 @@ const path = require("path");
  * 获取团支部团干部人数数据
  */
 async function createChartJSON() {
-  const tzbTreeList = require(path.resolve(__dirname, "../tzb_tree/tzb_tree.json"));
+  const tzbTree = require(path.resolve(__dirname, "../tzb_tree/tzb_tree.json"));
   let CURRENT_LIST = [];
   if (fs.existsSync(path.resolve(__dirname, "tgb_list.json"))) {
     CURRENT_LIST = require(path.resolve(__dirname, "tgb_list.json"));
   }
 
-  const treeList = tzbTreeList.map((tree) => {
+  const treeList = tzbTree.children.map((tree) => {
     const list = tree2tzbList(tree);
     return list;
   });

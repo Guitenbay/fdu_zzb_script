@@ -125,7 +125,7 @@ async function getTYListByQueryLeagueId(id, typeId) {
   }
 }
 
-async function getAllTZBTreeList(id) {
+async function getAllTZBChildrenTreeList(id) {
   // await wait(1000);
   console.log(id, "GET TZBList pending...");
 
@@ -157,7 +157,7 @@ async function getAllTZBTreeList(id) {
           leagueTypeId === "03TW" ||
           leagueTypeId === "04TGW"
         ) {
-          const nextList = await getAllTZBTreeList(leagueId);
+          const nextList = await getAllTZBChildrenTreeList(leagueId);
           result.push({
             leagueId,
             leagueFullName,
@@ -408,7 +408,7 @@ function tree2tzbList(tree, excludesLevel = []) {
 module.exports = {
   wait,
   getAllTZBPersonNumberInfo,
-  getAllTZBTreeList,
+  getAllTZBChildrenTreeList,
   getTWListByQueryLeagueId,
   getTGBListByQueryLeagueId,
   getTYListByQueryLeagueId,

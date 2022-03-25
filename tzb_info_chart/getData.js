@@ -41,13 +41,13 @@ function tree2tzbList(tree) {
 }
 
 async function createChartJSON() {
-  const tzbTreeList = require("../tzb_tree/tzb_tree.json");
+  const tzbTree = require("../tzb_tree/tzb_tree.json");
   let CURRENT_LIST = [];
   if (fs.existsSync(path.resolve(__dirname, "tzb_list.json"))) {
     CURRENT_LIST = require("./tzb_list.json");
   }
 
-  const treeList = tzbTreeList.map((tree) => {
+  const treeList = tzbTree.children.map((tree) => {
     const list = tree2tzbList(tree);
     return list;
   });

@@ -16,11 +16,8 @@ async function downloadAllExcel(year) {
     CURRENT_LIST = require("./dbdj_list.json");
   }
 
-  const tzbTreeList = require("../tzb_tree/tzb_tree.json");
-  const treeList = tzbTreeList.map((tree) => {
-    const list = tree2tzzList(tree, ["01TZB", "06BYBTZB"]);
-    return list;
-  });
+  const tzbTree = require("../tzb_tree/tzb_tree.json");
+  const treeList = tree2tzzList(tzbTree, ["01TZB", "06BYBTZB"]);
   const tzzList = treeList.flat();
   console.log(tzzList.length);
 
