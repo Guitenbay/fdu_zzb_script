@@ -37,13 +37,13 @@ function readChart2JSON(filepath) {
 
 function writeJSON2Chart(data) {
   console.log("生成 excel 表...\n");
-  const basic = XLSX.readFile(path.resolve(__dirname, path.resolve(__dirname, BASIC)));
+  const basic = XLSX.readFile(path.resolve(__dirname, BASIC));
 
   basic.Sheets[basic.SheetNames[0]] = XLSX.utils.json_to_sheet(data, {
     header: [],
   });
 
-  XLSX.writeFile(basic, path.resolve(__dirname, path.resolve(__dirname, OUT)));
+  XLSX.writeFile(basic, path.resolve(__dirname, OUT));
   console.log("生成 out.xlsx;\n");
 }
 

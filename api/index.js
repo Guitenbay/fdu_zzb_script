@@ -151,25 +151,25 @@ async function getAllTZBTreeList(id) {
         return [];
       }
       const result = [];
-      for (const { leagueId, leagueFullName, leagueTypeId } of list) {
+      for (const { leagueId, leagueFullName, leagueName, leagueTypeId } of list) {
         if (
           leagueTypeId === "02TZZ" ||
           leagueTypeId === "03TW" ||
           leagueTypeId === "04TGW"
         ) {
           const nextList = await getAllTZBTreeList(leagueId);
-          result.push(
-            {
-              leagueId,
-              leagueFullName,
-              leagueTypeId,
-              children: nextList,
-            }
-          );
+          result.push({
+            leagueId,
+            leagueFullName,
+            leagueName,
+            leagueTypeId,
+            children: nextList,
+          });
         } else {
           result.push({
             leagueId,
             leagueFullName,
+            leagueName,
             leagueTypeId,
           });
         }
@@ -277,10 +277,103 @@ async function downloadTyListExcel(id, filename) {
   });
 }
 
-function tree2tzbList(tree) {
+// 下载对标定级excel
+async function downloadDBDJListExcel(id, year, defaultFilename) {
+  let filename = defaultFilename;
+  console.log(id, "GET DBDJExcel pending...");
+  const config = {
+    method: "get",
+    url: `https://zhtj.youth.cn/v1/center/exportLowerReviewStatistics/${id}/${year}`,
+    headers: {
+      Cookie: COOKIE,
+    },
+    responseType: "stream",
+  };
+
+  const filepath = path.resolve(__dirname, `../对标定级数据统计/download/`);
+  if (!fs.existsSync(filepath)) {
+    fs.mkdirSync(filepath);
+  }
+  const response = await axios(config);
+  if (filename === undefined) {
+    // 文件名一般是在res.headers里：content-disposition;filename=xxxxxxxxxx.csv，这个让后端统一规定文件名怎么放前端就怎么取就行
+    const disposition =
+      typeof response.headers["content-disposition"] === "undefined"
+        ? response.headers["Content-Disposition"].split(";")[1]
+        : response.headers["content-disposition"].split(";")[1];
+
+    filename =
+      typeof disposition.split("fileName=")[1] === "undefined"
+        ? disposition.split("filename=")[1]
+        : disposition.split("fileName=")[1];
+  }
+  const writer = fs.createWriteStream(
+    path.resolve(filepath, `${filename}.xlsx`)
+  );
+  response.data.pipe(writer);
+  return new Promise((resolve, reject) => {
+    writer.on("finish", () => {
+      console.log(`写入 ${filename}.xlsx 完成;\n`);
+      resolve(true);
+    });
+    writer.on("error", (e) => {
+      console.error(
+        `Error: ${id}\n > 手动下载： https://zhtj.youth.cn/v1/center/exportLowerReviewStatistics/${id}/${year}`
+      );
+      console.log(e);
+      reject(false);
+    });
+  });
+}
+
+// 获取所有团组织列表
+function tree2tzzList(tree, excludesLevel = []) {
+  if (excludesLevel.includes(tree.leagueTypeId)) return [];
+  const key =
+    tree.leagueTypeId === "01TZB" || tree.leagueTypeId === "06BYBTZB"
+      ? "支部名"
+      : tree.leagueTypeId === "02TZZ"
+      ? "团总支名"
+      : tree.leagueTypeId === "03TW" || tree.leagueTypeId === "04TGW"
+      ? "团委名"
+      : "其他";
   if (Array.isArray(tree.children) && tree.children.length > 0) {
     const result = tree.children.map((tree) => {
-      const list = tree2tzbList(tree);
+      const list = tree2tzzList(tree, excludesLevel);
+      return list;
+    });
+    const list = result.flat();
+    return [
+      {
+        ID: tree.leagueId,
+        [key]: tree.leagueFullName,
+        // 组织类型: tree.leagueTypeId,
+      },
+    ].concat(list.map((item) => ({ ...item, [key]: tree.leagueFullName })));
+  } else {
+    if (tree.leagueId === undefined) {
+      return [
+        {
+          ID: undefined,
+          [key]: tree.leagueFullName,
+          // 组织类型: tree.leagueTypeId,
+        },
+      ];
+    }
+    return {
+      ID: tree.leagueId,
+      [key]: tree.leagueFullName,
+      组织类型: tree.leagueTypeId,
+    };
+  }
+}
+
+// 获取所有团支部列表
+function tree2tzbList(tree, excludesLevel = []) {
+  if (excludesLevel.includes(tree.leagueTypeId)) return [];
+  if (Array.isArray(tree.children) && tree.children.length > 0) {
+    const result = tree.children.map((tree) => {
+      const list = tree2tzbList(tree, excludesLevel);
       return list;
     });
     const list = result.flat();
@@ -292,6 +385,7 @@ function tree2tzbList(tree) {
         : "其他";
     return list.map((item) => ({ ...item, [key]: tree.leagueFullName }));
   } else {
+    if (!tree.leagueTypeId.includes("TZB")) return [];
     if (tree.leagueId === undefined) {
       return [
         {
@@ -320,5 +414,7 @@ module.exports = {
   getTYListByQueryLeagueId,
   postLoginInfo,
   downloadTyListExcel,
+  downloadDBDJListExcel,
+  tree2tzzList,
   tree2tzbList,
 };

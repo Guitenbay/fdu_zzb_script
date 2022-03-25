@@ -12,6 +12,8 @@
     "tgbexcel": "node ./tgb_info_chart/index.js",
     "download_ty_excel": "node ./ty_info_chart/downloadExcel.js",
     "tyexcel": "node ./ty_info_chart/index.js",
+    "download_dbdj_excel": "node ./对标定级数据统计/downloadExcel.js",
+    "dbdjexcel": "node ./对标定级数据统计/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

@@ -28,7 +28,7 @@ async function createChartJSON() {
   const len = tzbList.length;
   if (startIndex >= len) {
     console.log(
-      "之前已全部查询完成，如需更新查询数据，请删除本文件夹下的 tgb_list.json 文件，再重新启动脚本 <<\n"
+      "之前已全部查询完成，如需更新查询数据，请删除 tgb_info_chart 文件夹下的 tgb_list.json 文件，再重新启动脚本 <<\n"
     );
     return;
   }
