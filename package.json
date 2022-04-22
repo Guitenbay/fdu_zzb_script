@@ -8,6 +8,7 @@
     "tzbinfo": "node ./tzb_info_chart/getData.js",
     "tzbexcel": "node ./tzb_info_chart/index.js",
     "onschoolexcel": "node ./tzb_info_chart/onSchool.js",
+    "tyNumberByTWexcel": "node ./tzb_info_chart/activedTYGroupByTW.js",
     "tgbinfo": "node ./tgb_info_chart/getData.js",
     "tgbexcel": "node ./tgb_info_chart/index.js",
     "download_ty_excel": "node ./ty_info_chart/downloadExcel.js",
