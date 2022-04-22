@@ -31,16 +31,16 @@ function readChart2JSON(filepath) {
   });
 }
 
-function writeJSON2Chart(data) {
+function writeJSON2Chart(data, filepath) {
   console.log("生成 excel 表...\n");
   const basic = XLSX.readFile(path.resolve(__dirname, BASIC));
 
   basic.Sheets[basic.SheetNames[0]] = XLSX.utils.json_to_sheet(data, {
-    header: ["团委名", "团总支名", "支部名", "组织简称", "星级"],
+    header: [],
   });
 
-  XLSX.writeFile(basic, path.resolve(__dirname, OUT));
-  console.log("生成 out.xlsx;\n");
+  XLSX.writeFile(basic, path.resolve(__dirname, filepath));
+  console.log(`生成 ${filepath};\n`);
 }
 
 function findJsonFile(dir) {
@@ -155,24 +155,69 @@ const treeList = getChildrenStarList(tzbTree, ["01TZB", "06BYBTZB"]);
 const tzzList = treeList.flat();
 console.log("参评组织数:", tzzList.length);
 
-const result = tzzList.filter((item) => {
+const filtered = tzzList.filter((item) => {
   if (item.selfStar5 === 1 || item.selfStar4 === 1) {
     return true;
   } else {
     return false;
   }
 });
-console.log("五星/四星组织数:", result.length);
+console.log("五星/四星组织数:", filtered.length);
+const result = filtered.map((item) => ({
+  团委名: item.团委名,
+  团总支名: item.团总支名,
+  支部名: item.支部名,
+  组织简称: item.组织简称,
+  星级: item.selfStar5 === 1 ? "五星级" : "四星级",
+}));
 
-writeJSON2Chart(
-  result.map((item) => ({
-    团委名: item.团委名,
-    团总支名: item.团总支名,
-    支部名: item.支部名,
-    组织简称: item.组织简称,
-    星级: item.selfStar5 === 1 ? "五星级" : "四星级",
-  }))
-);
+const collegeFiveMap = new Map();
+const collegeFourMap = new Map();
+tzbTree.children.forEach(({ leagueFullName }) => {
+  if (!collegeFiveMap.has(leagueFullName)) {
+    collegeFiveMap.set(leagueFullName, 0);
+  }
+  if (!collegeFourMap.has(leagueFullName)) {
+    collegeFourMap.set(leagueFullName, 0);
+  }
+});
+for (const { 团委名, 星级 } of result) {
+  if (!collegeFiveMap.has(团委名)) {
+    collegeFiveMap.set(团委名, 0);
+  }
+  if (星级 === "五星级") {
+    collegeFiveMap.set(团委名, collegeFiveMap.get(团委名) + 1);
+    continue;
+  }
+  if (!collegeFourMap.has(团委名)) {
+    collegeFourMap.set(团委名, 0);
+  }
+  if (星级 === "四星级") {
+    collegeFourMap.set(团委名, collegeFourMap.get(团委名) + 1);
+    continue;
+  }
+}
+const collegeFiveList = [];
+collegeFiveMap.forEach((value, key) => {
+  collegeFiveList.push({
+    团委名: key,
+    五星级团组织数量: value,
+  });
+});
+
+const collegeFourList = [];
+collegeFourMap.forEach((value, key) => {
+  collegeFourList.push({
+    团委名: key,
+    四星级团组织数量: value,
+  });
+});
+
+// writeJSON2Chart(result, "./out.xlsx");
+
+writeJSON2Chart(collegeFiveList, "./out_五星级团组织.xlsx");
+
+writeJSON2Chart(collegeFourList, "./out_四星级团组织.xlsx");
 
 console.log(">> 推出 <<\n");
 // });

@@ -151,7 +151,12 @@ async function getAllTZBChildrenTreeList(id) {
         return [];
       }
       const result = [];
-      for (const { leagueId, leagueFullName, leagueName, leagueTypeId } of list) {
+      for (const {
+        leagueId,
+        leagueFullName,
+        leagueName,
+        leagueTypeId,
+      } of list) {
         if (
           leagueTypeId === "02TZZ" ||
           leagueTypeId === "03TW" ||
